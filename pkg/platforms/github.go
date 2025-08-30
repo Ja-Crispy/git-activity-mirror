@@ -251,10 +251,10 @@ func (g *GitHubPlatform) MirrorCommits(commits []Commit) error {
 		}
 		
 		// Create a new commit
-		newCommit := &github.Commit{
+		newCommit := &github.CreateCommitRequest{
 			Message: github.String(message),
-			Tree:    baseTree,
-			Parents: []*github.Commit{{SHA: ref.Object.SHA}},
+			Tree:    github.String(baseTree.GetSHA()),
+			Parents: []string{*ref.Object.SHA},
 			Author: &github.CommitAuthor{
 				Date:  &github.Timestamp{Time: commit.Date},
 				Name:  github.String(g.config.Auth.Username),
@@ -267,7 +267,7 @@ func (g *GitHubPlatform) MirrorCommits(commits []Commit) error {
 			},
 		}
 		
-		createdCommit, _, err := g.client.Git.CreateCommit(context.Background(), owner, repoName, newCommit)
+		createdCommit, _, err := g.client.Git.CreateCommit(g.ctx, owner, repoName, newCommit)
 		if err != nil {
 			return fmt.Errorf("failed to create mirror commit: %w", err)
 		}
