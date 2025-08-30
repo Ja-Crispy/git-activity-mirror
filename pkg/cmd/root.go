@@ -30,8 +30,8 @@ allowing you to maintain an accurate contribution graph across all platforms.`,
 	rootCmd.PersistentFlags().Bool("dry-run", false, "show what would be done without making changes")
 
 	// Bind flags to viper
-	viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
-	viper.BindPFlag("dry-run", rootCmd.PersistentFlags().Lookup("dry-run"))
+	_ = viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
+	_ = viper.BindPFlag("dry-run", rootCmd.PersistentFlags().Lookup("dry-run"))
 
 	// Initialize config
 	cobra.OnInitialize(func() { initConfig(cfgFile) })

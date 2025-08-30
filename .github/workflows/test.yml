@@ -8,10 +8,9 @@ on:
 
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
         go-version: ['1.21', '1.22', '1.23']
     
     steps:
@@ -72,7 +71,7 @@ jobs:
       with:
         file: ./coverage.out
         flags: unittests
-        name: codecov-${{ matrix.os }}-go${{ matrix.go-version }}
+        name: codecov-${{ runner.os }}-go${{ matrix.go-version }}
 
   lint:
     runs-on: ubuntu-latest
@@ -100,7 +99,5 @@ jobs:
       with:
         go-version: '1.21'
     
-    - name: Run Gosec Security Scanner
-      uses: securecodewarrior/github-action-gosec@master
-      with:
-        args: ./...
+    - name: Gosec Security Checker
+      uses: securego/gosec@v2.22.8

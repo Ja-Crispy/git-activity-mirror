@@ -90,7 +90,7 @@ func (g *GitLabPlatform) ListRepositories() ([]Repository, error) {
 	
 	opt := &gitlab.ListProjectsOptions{
 		ListOptions: gitlab.ListOptions{PerPage: 100},
-		Owned:       gitlab.Bool(true),
+		Owned:       gitlab.Ptr(true),
 	}
 	
 	for {
@@ -134,11 +134,8 @@ func (g *GitLabPlatform) GetCommits(repo Repository, since time.Time) ([]Commit,
 		Since:       &since,
 	}
 	
-	// Filter by author email if specified
-	if g.config.Auth.Username != "" {
-		// Note: GitLab API doesn't support AuthorEmail filter in ListCommitsOptions
-		// We'll filter commits by author email after fetching them if needed
-	}
+	// Note: GitLab API doesn't support AuthorEmail filter in ListCommitsOptions
+	// We'll filter commits by author email after fetching if needed
 	
 	for {
 		commits, resp, err := g.client.Commits.ListCommits(projectID, opt)
@@ -192,7 +189,7 @@ func (g *GitLabPlatform) InitializeMirror(name string, visibility string) error 
 	
 	project := &gitlab.CreateProjectOptions{
 		Name:        &name,
-		Description: gitlab.String("Mirror of git activity from other platforms"),
+		Description: gitlab.Ptr("Mirror of git activity from other platforms"),
 		Visibility:  &vis,
 	}
 	
@@ -220,7 +217,7 @@ func (g *GitLabPlatform) MirrorCommits(commits []Commit) error {
 	// Find the project
 	projects, _, err := g.client.Projects.ListProjects(&gitlab.ListProjectsOptions{
 		Search: &mirrorRepo,
-		Owned:  gitlab.Bool(true),
+		Owned:  gitlab.Ptr(true),
 	})
 	if err != nil {
 		return fmt.Errorf("failed to find mirror project: %w", err)
@@ -247,24 +244,24 @@ func (g *GitLabPlatform) MirrorCommits(commits []Commit) error {
 		// For now, create a simple file update to simulate activity
 		actions := []*gitlab.CommitActionOptions{
 			{
-				Action:   gitlab.FileAction(gitlab.FileUpdate),
-				FilePath: gitlab.String(".activity"),
-				Content:  gitlab.String(fmt.Sprintf("Activity recorded: %s", commit.Date.Format(time.RFC3339))),
+				Action:   gitlab.Ptr(gitlab.FileUpdate),
+				FilePath: gitlab.Ptr(".activity"),
+				Content:  gitlab.Ptr(fmt.Sprintf("Activity recorded: %s", commit.Date.Format(time.RFC3339))),
 			},
 		}
 		
 		createCommitOpt := &gitlab.CreateCommitOptions{
-			Branch:        gitlab.String("main"),
+			Branch:        gitlab.Ptr("main"),
 			CommitMessage: &message,
 			Actions:       actions,
-			AuthorEmail:   gitlab.String(g.config.Auth.Username + "@users.noreply.gitlab.com"),
-			AuthorName:    gitlab.String(g.config.Auth.Username),
+			AuthorEmail:   gitlab.Ptr(g.config.Auth.Username + "@users.noreply.gitlab.com"),
+			AuthorName:    gitlab.Ptr(g.config.Auth.Username),
 		}
 		
 		_, _, err := g.client.Commits.CreateCommit(projectID, createCommitOpt)
 		if err != nil {
 			// Try master branch if main doesn't exist
-			createCommitOpt.Branch = gitlab.String("master")
+			createCommitOpt.Branch = gitlab.Ptr("master")
 			_, _, err = g.client.Commits.CreateCommit(projectID, createCommitOpt)
 			if err != nil {
 				return fmt.Errorf("failed to create mirror commit: %w", err)
@@ -282,7 +279,7 @@ func (g *GitLabPlatform) GetMirrorStatus() (MirrorStatus, error) {
 	// Find the project
 	projects, _, err := g.client.Projects.ListProjects(&gitlab.ListProjectsOptions{
 		Search: &mirrorRepo,
-		Owned:  gitlab.Bool(true),
+		Owned:  gitlab.Ptr(true),
 	})
 	if err != nil {
 		return MirrorStatus{}, fmt.Errorf("failed to find mirror project: %w", err)
