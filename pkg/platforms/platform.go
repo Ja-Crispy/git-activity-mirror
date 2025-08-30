@@ -33,11 +33,11 @@ type GitPlatform interface {
 type PlatformType string
 
 const (
-	PlatformGitHub     PlatformType = "github"
-	PlatformGitLab     PlatformType = "gitlab"
-	PlatformBitbucket  PlatformType = "bitbucket"
+	PlatformGitHub      PlatformType = "github"
+	PlatformGitLab      PlatformType = "gitlab"
+	PlatformBitbucket   PlatformType = "bitbucket"
 	PlatformAzureDevOps PlatformType = "azuredevops"
-	PlatformGenericGit PlatformType = "generic"
+	PlatformGenericGit  PlatformType = "generic"
 )
 
 // AuthConfig holds authentication configuration for a platform
@@ -105,20 +105,20 @@ type MirrorStatus struct {
 
 // PlatformConfig holds platform-specific configuration
 type PlatformConfig struct {
-	Name      string                 `yaml:"name"`
-	Platform  PlatformType           `yaml:"platform"`
-	Host      string                 `yaml:"host,omitempty"`
-	Auth      AuthConfig             `yaml:"auth"`
-	Repos     []string               `yaml:"repositories,omitempty"`
-	Mirror    MirrorConfig           `yaml:"mirror,omitempty"`
-	Extra     map[string]interface{} `yaml:"extra,omitempty"`
+	Name     string                 `yaml:"name"`
+	Platform PlatformType           `yaml:"platform"`
+	Host     string                 `yaml:"host,omitempty"`
+	Auth     AuthConfig             `yaml:"auth"`
+	Repos    []string               `yaml:"repositories,omitempty"`
+	Mirror   MirrorConfig           `yaml:"mirror,omitempty"`
+	Extra    map[string]interface{} `yaml:"extra,omitempty"`
 }
 
 // MirrorConfig holds mirror-specific configuration
 type MirrorConfig struct {
-	Repository string `yaml:"repository"`      // Name for mirror repo (e.g., "work-activity-mirror")
-	Visibility string `yaml:"visibility"`      // public, private
-	Branch     string `yaml:"branch,omitempty"` // Target branch (default: main)
+	Repository string `yaml:"repository"`         // Name for mirror repo (e.g., "work-activity-mirror")
+	Visibility string `yaml:"visibility"`         // public, private
+	Branch     string `yaml:"branch,omitempty"`   // Target branch (default: main)
 	Strategy   string `yaml:"strategy,omitempty"` // unified, separate, hashed
 }
 
@@ -139,8 +139,8 @@ func NewPlatform(platformType PlatformType, config PlatformConfig) (GitPlatform,
 // Common errors
 var (
 	ErrUnsupportedPlatform = fmt.Errorf("unsupported platform")
-	ErrInvalidAuth        = fmt.Errorf("invalid authentication")
-	ErrRepositoryNotFound = fmt.Errorf("repository not found")
-	ErrPermissionDenied   = fmt.Errorf("permission denied")
-	ErrRateLimit          = fmt.Errorf("rate limit exceeded")
+	ErrInvalidAuth         = fmt.Errorf("invalid authentication")
+	ErrRepositoryNotFound  = fmt.Errorf("repository not found")
+	ErrPermissionDenied    = fmt.Errorf("permission denied")
+	ErrRateLimit           = fmt.Errorf("rate limit exceeded")
 )

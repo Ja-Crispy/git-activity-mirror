@@ -31,7 +31,7 @@ a different time range using the --since flag.`,
 func runSync(cmd *cobra.Command, args []string) error {
 	verbose := viper.GetBool("verbose")
 	dryRun := viper.GetBool("dry-run")
-	
+
 	if verbose {
 		fmt.Println("🔄 Starting sync operation...")
 	}
@@ -42,9 +42,9 @@ func runSync(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("invalid since duration: %w", err)
 	}
-	
+
 	sinceTime := time.Now().Add(-since)
-	
+
 	if verbose {
 		fmt.Printf("📅 Syncing commits since: %s\n", sinceTime.Format(time.RFC3339))
 	}
@@ -61,9 +61,9 @@ func runSync(cmd *cobra.Command, args []string) error {
 	// 2. Initialize source and target platforms
 	// 3. Fetch commits from sources since the specified time
 	// 4. Mirror commits to targets
-	
+
 	fmt.Println("✅ Sync completed successfully")
-	
+
 	return nil
 }
 

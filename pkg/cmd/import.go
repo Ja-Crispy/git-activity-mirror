@@ -33,20 +33,20 @@ time range using the --since flag.`,
 func runImport(cmd *cobra.Command, args []string) error {
 	verbose := viper.GetBool("verbose")
 	dryRun := viper.GetBool("dry-run")
-	
+
 	fmt.Println("📚 Starting historical import...")
-	
+
 	// Parse since duration
 	sinceStr, _ := cmd.Flags().GetString("since")
 	since, err := parseDuration(sinceStr)
 	if err != nil {
 		return fmt.Errorf("invalid since duration: %w", err)
 	}
-	
+
 	sinceTime := time.Now().Add(-since)
 	batchSize, _ := cmd.Flags().GetInt("batch-size")
 	skipExisting, _ := cmd.Flags().GetBool("skip-existing")
-	
+
 	if verbose {
 		fmt.Printf("📅 Importing commits since: %s\n", sinceTime.Format("2006-01-02"))
 		fmt.Printf("📦 Batch size: %d commits\n", batchSize)
@@ -56,7 +56,7 @@ func runImport(cmd *cobra.Command, args []string) error {
 	if dryRun {
 		fmt.Println("🧪 Dry run mode - no changes will be made")
 		fmt.Println()
-		
+
 		// In dry run, show what would be imported
 		fmt.Println("📊 Import preview:")
 		fmt.Println("  Sources found: 1 (GitLab)")
@@ -75,8 +75,8 @@ func runImport(cmd *cobra.Command, args []string) error {
 	// 3. Fetch all commits from sources since the specified time
 	// 4. Process commits in batches
 	// 5. Mirror commits to targets with preserved timestamps
-	
+
 	fmt.Println("✅ Historical import completed successfully")
-	
+
 	return nil
 }

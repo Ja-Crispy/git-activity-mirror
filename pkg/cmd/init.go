@@ -120,11 +120,11 @@ type Config struct {
 }
 
 type SourceConfig struct {
-	Name         string   `yaml:"name"`
-	Platform     string   `yaml:"platform"`
-	Host         string   `yaml:"host,omitempty"`
+	Name         string     `yaml:"name"`
+	Platform     string     `yaml:"platform"`
+	Host         string     `yaml:"host,omitempty"`
 	Auth         AuthConfig `yaml:"auth"`
-	Repositories []string `yaml:"repositories,omitempty"`
+	Repositories []string   `yaml:"repositories,omitempty"`
 }
 
 type TargetConfig struct {

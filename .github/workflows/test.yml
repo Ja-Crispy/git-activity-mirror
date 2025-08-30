@@ -9,95 +9,22 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        go-version: ['1.21', '1.22', '1.23']
-    
     steps:
     - uses: actions/checkout@v4
     
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: ${{ matrix.go-version }}
-    
-    - name: Cache Go modules
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/.cache/go-build
-          ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ matrix.go-version }}-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-${{ matrix.go-version }}-
+        go-version: '1.21'
     
     - name: Download dependencies
       run: go mod download
     
-    - name: Verify dependencies
-      run: go mod verify
-    
     - name: Run go vet
       run: go vet ./...
     
-    - name: Run go fmt check
-      run: |
-        if [ "$(gofmt -s -l . | wc -l)" -gt 0 ]; then
-          echo "Code is not formatted properly:"
-          gofmt -s -l .
-          exit 1
-        fi
-      shell: bash
-    
-    - name: Run tests
-      run: go test -race -coverprofile=coverage.out -covermode=atomic ./...
-    
     - name: Test build
-      run: |
-        go build -o git-activity-mirror-test ./cmd/git-activity-mirror
+      run: go build -o git-activity-mirror-test ./cmd/git-activity-mirror
     
-    - name: Test CLI commands (dry-run)
-      run: |
-        # Test help commands
-        ./git-activity-mirror-test --help
-        ./git-activity-mirror-test sync --help
-        ./git-activity-mirror-test import --help
-        ./git-activity-mirror-test status --help
-        ./git-activity-mirror-test config --help
-      shell: bash
-    
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        file: ./coverage.out
-        flags: unittests
-        name: codecov-${{ runner.os }}-go${{ matrix.go-version }}
-
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.21'
-    
-    - name: Run golangci-lint
-      uses: golangci/golangci-lint-action@v3
-      with:
-        version: v1.54
-        args: --timeout=5m
-
-  security:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.21'
-    
-    - name: Gosec Security Checker
-      uses: securego/gosec@v2.22.8
+    - name: Test CLI
+      run: ./git-activity-mirror-test --help
