@@ -276,7 +276,7 @@ func (g *GitHubPlatform) MirrorCommits(commits []Commit) error {
 			Parents: parents,
 			Author:  author,
 			Committer: committer,
-		})
+		}, &github.CreateCommitOptions{})
 		if err != nil {
 			return fmt.Errorf("failed to create mirror commit: %w", err)
 		}
