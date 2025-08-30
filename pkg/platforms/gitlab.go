@@ -136,13 +136,8 @@ func (g *GitLabPlatform) GetCommits(repo Repository, since time.Time) ([]Commit,
 	
 	// Filter by author email if specified
 	if g.config.Auth.Username != "" {
-		// Try to get user email from the username
-		users, _, err := g.client.Users.ListUsers(&gitlab.ListUsersOptions{
-			Username: &g.config.Auth.Username,
-		})
-		if err == nil && len(users) > 0 {
-			opt.AuthorEmail = &users[0].Email
-		}
+		// Note: GitLab API doesn't support AuthorEmail filter in ListCommitsOptions
+		// We'll filter commits by author email after fetching them if needed
 	}
 	
 	for {

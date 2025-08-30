@@ -129,12 +129,8 @@ func NewPlatform(platformType PlatformType, config PlatformConfig) (GitPlatform,
 		return NewGitHubPlatform(config)
 	case PlatformGitLab:
 		return NewGitLabPlatform(config)
-	case PlatformBitbucket:
-		return NewBitbucketPlatform(config)
-	case PlatformAzureDevOps:
-		return NewAzureDevOpsPlatform(config)
-	case PlatformGenericGit:
-		return NewGenericGitPlatform(config)
+	case PlatformBitbucket, PlatformAzureDevOps, PlatformGenericGit:
+		return nil, fmt.Errorf("platform %s not implemented yet - coming in v0.2.0", platformType)
 	default:
 		return nil, ErrUnsupportedPlatform
 	}
