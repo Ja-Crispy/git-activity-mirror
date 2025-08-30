@@ -20,7 +20,7 @@ a different time range using the --since flag.`,
 		RunE: runSync,
 	}
 
-	cmd.Flags().String("since", "24h", "sync commits since this duration (e.g., 24h, 7d, 1w)")
+	cmd.Flags().String("since", "24h", "sync commits since this duration (e.g., 24h, 7d, 1w, 3mo, 1y)")
 	cmd.Flags().StringSlice("sources", nil, "specific source platforms to sync from")
 	cmd.Flags().StringSlice("targets", nil, "specific target platforms to sync to")
 	cmd.Flags().Bool("force", false, "force sync even if commits already exist")
@@ -67,10 +67,24 @@ func runSync(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-// parseDuration parses duration strings like "24h", "7d", "1w"
+// parseDuration parses duration strings like "24h", "7d", "1w", "3mo", "1y"
 func parseDuration(s string) (time.Duration, error) {
 	// Handle common suffixes
 	switch {
+	case len(s) > 1 && s[len(s)-1] == 'y':
+		// Years (approximate: 365 days)
+		years, err := time.ParseDuration(s[:len(s)-1] + "h")
+		if err != nil {
+			return 0, err
+		}
+		return years * 24 * 365, nil
+	case len(s) > 2 && s[len(s)-2:] == "mo":
+		// Months (approximate: 30 days) - use "mo" to avoid conflict with minutes "m"
+		months, err := time.ParseDuration(s[:len(s)-2] + "h")
+		if err != nil {
+			return 0, err
+		}
+		return months * 24 * 30, nil
 	case len(s) > 1 && s[len(s)-1] == 'd':
 		// Days
 		days, err := time.ParseDuration(s[:len(s)-1] + "h")
@@ -86,7 +100,7 @@ func parseDuration(s string) (time.Duration, error) {
 		}
 		return weeks * 24 * 7, nil
 	default:
-		// Standard Go duration format
+		// Standard Go duration format (h, m, s)
 		return time.ParseDuration(s)
 	}
 }

@@ -21,7 +21,7 @@ time range using the --since flag.`,
 		RunE: runImport,
 	}
 
-	cmd.Flags().String("since", "1y", "import commits since this duration (e.g., 1y, 6m, 3m)")
+	cmd.Flags().String("since", "1y", "import commits since this duration (e.g., 1y, 6mo, 3mo)")
 	cmd.Flags().StringSlice("sources", nil, "specific source platforms to import from")
 	cmd.Flags().StringSlice("targets", nil, "specific target platforms to import to")
 	cmd.Flags().Int("batch-size", 100, "number of commits to process in each batch")
