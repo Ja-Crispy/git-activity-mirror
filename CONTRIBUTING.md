@@ -1,8 +1,6 @@
-# Contributing to git-activity-mirror
+# Contributing
 
-Thank you for considering contributing to git-activity-mirror! This project helps developers maintain accurate contribution graphs while preserving privacy.
-
-## 🚀 Quick Start for Contributors
+## Development Setup
 
 ### Prerequisites
 - Go 1.21 or higher
