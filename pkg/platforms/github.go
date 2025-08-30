@@ -250,24 +250,33 @@ func (g *GitHubPlatform) MirrorCommits(commits []Commit) error {
 			return fmt.Errorf("failed to get base tree: %w", err)
 		}
 		
-		// Create a new commit
-		newCommit := &github.CreateCommitRequest{
-			Message: github.String(message),
-			Tree:    github.String(baseTree.GetSHA()),
-			Parents: []string{*ref.Object.SHA},
-			Author: &github.CommitAuthor{
-				Date:  &github.Timestamp{Time: commit.Date},
-				Name:  github.String(g.config.Auth.Username),
-				Email: github.String(g.config.Auth.Username + "@users.noreply.github.com"),
-			},
-			Committer: &github.CommitAuthor{
-				Date:  &github.Timestamp{Time: commit.Date},
-				Name:  github.String(g.config.Auth.Username),
-				Email: github.String(g.config.Auth.Username + "@users.noreply.github.com"),
-			},
+		// Create commit parameters
+		author := &github.CommitAuthor{
+			Date:  &github.Timestamp{Time: commit.Date},
+			Name:  github.String(g.config.Auth.Username),
+			Email: github.String(g.config.Auth.Username + "@users.noreply.github.com"),
 		}
 		
-		createdCommit, _, err := g.client.Git.CreateCommit(g.ctx, owner, repoName, newCommit)
+		committer := &github.CommitAuthor{
+			Date:  &github.Timestamp{Time: commit.Date},
+			Name:  github.String(g.config.Auth.Username),
+			Email: github.String(g.config.Auth.Username + "@users.noreply.github.com"),
+		}
+		
+		parents := []*github.Commit{
+			{SHA: ref.Object.SHA},
+		}
+		
+		tree := &github.Tree{SHA: baseTree.SHA}
+		
+		// Create the commit
+		createdCommit, _, err := g.client.Git.CreateCommit(g.ctx, owner, repoName, &github.Commit{
+			Message: github.String(message),
+			Tree:    tree,
+			Parents: parents,
+			Author:  author,
+			Committer: committer,
+		})
 		if err != nil {
 			return fmt.Errorf("failed to create mirror commit: %w", err)
 		}
