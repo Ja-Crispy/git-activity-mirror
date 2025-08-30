@@ -1,0 +1,58 @@
+# Multi-Platform Activity Mirroring Configuration
+# This configuration aggregates activity from multiple sources to a single target
+
+version: 1
+
+# Multiple source platforms
+sources:
+  - name: work-gitlab
+    platform: gitlab
+    host: gitlab.company.com
+    auth:
+      type: token
+      username: work-username
+      token: ${WORK_GITLAB_TOKEN}
+    repositories:
+      - backend-api
+      - frontend-app
+      - infrastructure
+
+  - name: personal-github
+    platform: github
+    auth:
+      type: token
+      username: personal-username
+      token: ${PERSONAL_GITHUB_TOKEN}
+    repositories:
+      - personal-project
+      - side-hustle-app
+
+  - name: client-bitbucket
+    platform: bitbucket
+    host: bitbucket.org
+    auth:
+      type: token
+      username: freelancer-username
+      token: ${BITBUCKET_TOKEN}
+    repositories:
+      - client-website
+      - mobile-app
+
+# Single target to aggregate all activity
+targets:
+  - name: main-profile
+    platform: github
+    auth:
+      type: token
+      username: main-username
+      token: ${MAIN_GITHUB_TOKEN}
+    mirror:
+      repository: all-my-work
+      visibility: private
+      branch: main
+
+# Sync configuration
+sync:
+  schedule: "0 18 * * *"  # Daily at 6 PM
+  timezone: "America/New_York"
+  commit_message: "Development activity - {date} ({source})"

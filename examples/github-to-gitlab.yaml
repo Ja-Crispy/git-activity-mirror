@@ -1,0 +1,38 @@
+# GitHub → GitLab Activity Mirroring Configuration
+# This configuration mirrors your GitHub work activity to GitLab
+
+version: 1
+
+# Source platforms (where your actual work happens)
+sources:
+  - name: opensource
+    platform: github
+    auth:
+      type: token
+      username: your-github-username
+      token: ${GITHUB_TOKEN}
+    repositories:
+      - your-repo-1
+      - your-repo-2
+      - organization/shared-repo
+      # Add your repository names here
+
+# Target platforms (where you want to show activity)
+targets:
+  - name: gitlab-profile
+    platform: gitlab
+    host: gitlab.com  # or your company's GitLab instance
+    auth:
+      type: token
+      username: your-gitlab-username
+      token: ${GITLAB_TOKEN}
+    mirror:
+      repository: github-activity-mirror
+      visibility: private
+      branch: main
+
+# Sync configuration
+sync:
+  schedule: "0 18 * * *"  # Daily at 6 PM
+  timezone: "local"
+  commit_message: "Open source work - {date}"
