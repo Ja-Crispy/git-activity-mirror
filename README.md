@@ -29,9 +29,10 @@ A cross-platform, platform-agnostic tool that mirrors git commit activity betwee
 
 ### Privacy-First Design
 - ❌ **No code exposure** - Never accesses actual file contents
-- ❌ **No sensitive data** - Only timestamps and generic messages
+- ❌ **No sensitive data** - Only timestamps and generic messages  
+- ❌ **No project names exposed** - Uses generic mirror repo names
 - ✅ **Accurate activity** - Real commit times, not fake patterns
-- ✅ **Configurable messages** - Generic like "Development work - 2025-08-30"
+- ✅ **Unified mirror strategy** - All work commits go to one `work-activity-mirror` repo
 
 ### Cross-Platform
 - 🪟 **Windows** - Native binary + Task Scheduler
@@ -91,6 +92,18 @@ git-activity-mirror import --since=1y
 ```bash
 git-activity-mirror sync --schedule
 ```
+
+## 🔒 Privacy-Preserving Mirror Strategy
+
+**The Problem:** Using project names like `scyai-proto-mirror` or `python-fastapi-mirror` exposes information about what you're working on.
+
+**The Solution:** All commits from different source projects are mirrored into a **single unified repository** with a generic name like `work-activity-mirror`.
+
+This approach:
+- ✅ Maintains accurate commit timestamps and frequency
+- ✅ Shows consistent work patterns on your contribution graph  
+- ✅ Reveals nothing about specific projects or technologies
+- ✅ Works with any number of source repositories
 
 ## 📝 Configuration Examples
 

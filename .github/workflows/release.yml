@@ -1,0 +1,143 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+    
+    - name: Get version from tag
+      id: version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+    
+    - name: Build binaries
+      run: |
+        # Windows AMD64
+        GOOS=windows GOARCH=amd64 go build -o git-activity-mirror-windows-amd64.exe ./cmd/git-activity-mirror
+        
+        # Linux AMD64
+        GOOS=linux GOARCH=amd64 go build -o git-activity-mirror-linux-amd64 ./cmd/git-activity-mirror
+        
+        # macOS AMD64
+        GOOS=darwin GOARCH=amd64 go build -o git-activity-mirror-darwin-amd64 ./cmd/git-activity-mirror
+        
+        # macOS ARM64 (Apple Silicon)
+        GOOS=darwin GOARCH=arm64 go build -o git-activity-mirror-darwin-arm64 ./cmd/git-activity-mirror
+    
+    - name: Calculate checksums
+      run: |
+        sha256sum git-activity-mirror-* > checksums.txt
+        cat checksums.txt
+    
+    - name: Run tests
+      run: go test -v ./...
+    
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.version.outputs.VERSION }}
+        release_name: ${{ steps.version.outputs.VERSION }} - Platform-Agnostic Git Activity Mirroring
+        body: |
+          ## Platform-Agnostic Git Activity Mirroring
+          
+          Mirror your git commit activity between platforms while keeping your code private.
+          
+          ### Features
+          - ✅ GitLab ↔ GitHub synchronization
+          - ✅ Historical import with `--since` flag (1y, 6mo, 3mo, etc.)
+          - ✅ Daily sync operations
+          - ✅ Dry-run mode for testing
+          - ✅ Cross-platform binaries
+          - ✅ Privacy-first (mirrors activity, not code)
+          
+          ### Downloads
+          
+          | Platform | Architecture | Download |
+          |----------|--------------|----------|
+          | Windows | x64 | `git-activity-mirror-windows-amd64.exe` |
+          | Linux | x64 | `git-activity-mirror-linux-amd64` |
+          | macOS | x64 (Intel) | `git-activity-mirror-darwin-amd64` |
+          | macOS | ARM64 (Apple Silicon) | `git-activity-mirror-darwin-arm64` |
+          
+          ### Quick Start
+          ```bash
+          # Initialize configuration
+          ./git-activity-mirror init
+          
+          # Import historical commits (dry-run)
+          ./git-activity-mirror import --since=1y --dry-run
+          
+          # Sync recent activity
+          ./git-activity-mirror sync --since=24h
+          ```
+          
+          ### Verification
+          Verify your download with SHA256 checksums in `checksums.txt`.
+          
+          **Full Changelog**: https://github.com/Ja-Crispy/git-activity-mirror/commits/${{ steps.version.outputs.VERSION }}
+        draft: false
+        prerelease: false
+    
+    - name: Upload Windows Binary
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./git-activity-mirror-windows-amd64.exe
+        asset_name: git-activity-mirror-windows-amd64.exe
+        asset_content_type: application/octet-stream
+    
+    - name: Upload Linux Binary
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./git-activity-mirror-linux-amd64
+        asset_name: git-activity-mirror-linux-amd64
+        asset_content_type: application/octet-stream
+    
+    - name: Upload macOS Intel Binary
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./git-activity-mirror-darwin-amd64
+        asset_name: git-activity-mirror-darwin-amd64
+        asset_content_type: application/octet-stream
+    
+    - name: Upload macOS Apple Silicon Binary
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./git-activity-mirror-darwin-arm64
+        asset_name: git-activity-mirror-darwin-arm64
+        asset_content_type: application/octet-stream
+    
+    - name: Upload Checksums
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./checksums.txt
+        asset_name: checksums.txt
+        asset_content_type: text/plain

@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 General Discussion
+    url: https://github.com/Ja-Crispy/git-activity-mirror/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: 📚 Documentation
+    url: https://github.com/Ja-Crispy/git-activity-mirror#readme
+    about: Read the documentation and setup guides
+  - name: 🔐 Security Issues
+    url: https://github.com/Ja-Crispy/git-activity-mirror/security/advisories/new
+    about: Report security vulnerabilities privately

@@ -116,9 +116,10 @@ type PlatformConfig struct {
 
 // MirrorConfig holds mirror-specific configuration
 type MirrorConfig struct {
-	Repository string `yaml:"repository"`
-	Visibility string `yaml:"visibility"` // public, private
-	Branch     string `yaml:"branch,omitempty"`
+	Repository string `yaml:"repository"`      // Name for mirror repo (e.g., "work-activity-mirror")
+	Visibility string `yaml:"visibility"`      // public, private
+	Branch     string `yaml:"branch,omitempty"` // Target branch (default: main)
+	Strategy   string `yaml:"strategy,omitempty"` // unified, separate, hashed
 }
 
 // NewPlatform creates a new platform instance based on the platform type
